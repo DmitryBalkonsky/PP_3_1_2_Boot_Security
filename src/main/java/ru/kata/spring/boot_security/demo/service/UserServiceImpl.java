@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -55,19 +56,24 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void updateUser(User user, String[] selectedRoles) {
-        if (userRepository.findByUsername(user.getUsername()) != null &&
-                !userRepository.findByUsername(user.getUsername()).getId().equals(user.getId())) {
+        User existingUser = userRepository.findByUsername(user.getUsername());
+        if (existingUser != null && !existingUser.getId().equals(user.getId())) {
             throw new InvalidParameterException("Cannot save user, such email already exists in the database: "
                     + user.getUsername());
         }
+
+        User currentUser = userRepository.findById(user.getId()).orElseThrow(() ->
+                new IllegalArgumentException("User with ID " + user.getId() + " not found")
+        );
         if (user.getPassword().isEmpty()) {
-            user.setPassword(userRepository.findById(user.getId()).get().getPassword());
+            user.setPassword(currentUser.getPassword());
         } else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        Set<Role> roles = new HashSet<>();
-        Arrays.stream(selectedRoles)
-                .forEach(x -> roles.add(roleRepository.findRoleByRole(x)));
+
+        Set<Role> roles = Arrays.stream(selectedRoles)
+                .map(roleRepository::findRoleByRole)
+                .collect(Collectors.toSet());
         user.setRoles(roles);
         userRepository.save(user);
     }

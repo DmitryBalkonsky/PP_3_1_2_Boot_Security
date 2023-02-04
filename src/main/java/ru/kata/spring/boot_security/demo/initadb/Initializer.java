@@ -29,9 +29,9 @@ public class Initializer {
         roleRepository.save(role2);
 
 
-        User user = new User("user", "Evgeny", "Savelev", "user@mail.ru",
+        User user = new User("user", "user", "user", "user@mail.ru",
                 "a$12$SbrlyMjtF2vx/i1tbD0qLOdKBFbr1A5GxvI/izG4t9gBVRY1OgfeG");//password 200
-        User user2 = new User("admin", "Dgo", "Didi", "Admin@mail.ru",
+        User user2 = new User("admin", "admin", "admin", "Admin@mail.ru",
                 "$2a$12$Djm7UfaK//Iw6j.NntGh3.kXlRONwNxF0Fd3DQ9pI.RS6IVqrhFpm");//password 100
         user.setRoles(new HashSet<>(Set.of(role2)));
         user2.setRoles(new HashSet<>(Set.of(role1)));
